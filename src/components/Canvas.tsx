@@ -35,8 +35,10 @@ function rectFromPoints(start: Point, current: Point): { x: number; y: number; w
 }
 
 function circleFromPoints(start: Point, current: Point): { x: number; y: number; radius: number } {
-  const radius = Math.hypot(current.x - start.x, current.y - start.y);
-  return { x: start.x, y: start.y, radius };
+  const x = (start.x + current.x) / 2;
+  const y = (start.y + current.y) / 2;
+  const radius = Math.hypot(current.x - start.x, current.y - start.y) / 2;
+  return { x, y, radius };
 }
 
 function translateShape(shape: Shape, dx: number, dy: number): Shape {

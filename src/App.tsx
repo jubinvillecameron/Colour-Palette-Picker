@@ -53,6 +53,29 @@ function App() {
     [history],
   );
 
+  // Applies a whole batch of colour swaps (e.g. from "Randomize Palette") as a
+  // single history entry, so undo/redo reverts/reapplies the entire shuffle
+  // in one step rather than one step per swatch.
+  const handleRandomizePalette = useCallback(
+    (mapping: { from: string; to: string }[]) => {
+      const changeMap = new Map<string, string>();
+      for (const { from, to } of mapping) {
+        if (from !== to) changeMap.set(from.toLowerCase(), to);
+      }
+      if (changeMap.size === 0) return;
+
+      const next = history.present.map((s) => {
+        const replacement = changeMap.get(s.color.toLowerCase());
+        return replacement ? { ...s, color: replacement } : s;
+      });
+      history.set(next);
+
+      const currentReplacement = changeMap.get(color.toLowerCase());
+      if (currentReplacement) setColor(currentReplacement);
+    },
+    [history, color],
+  );
+
   // Shapes with any in-progress (uncommitted) color edit applied, for live preview.
   const displayShapes = useMemo(() => {
     if (!colorDraft) return history.present;
@@ -111,6 +134,12 @@ function App() {
     history.set(history.present.filter((s) => !ids.has(s.id)));
     setSelectedIds([]);
   }, [selectedIds, history]);
+
+  const handleClearCanvas = useCallback(() => {
+    if (history.present.length === 0) return;
+    history.set([]);
+    setSelectedIds([]);
+  }, [history]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -211,6 +240,8 @@ function App() {
         onRedo={history.redo}
         canUndo={history.canUndo}
         canRedo={history.canRedo}
+        onClearCanvas={handleClearCanvas}
+        canClear={history.present.length > 0}
       />
 
       {editingShape && editingPopover && (
@@ -249,6 +280,7 @@ function App() {
           onClose={() => setPaletteOpen(false)}
           onSelectColor={setColor}
           onRecolor={handleRecolor}
+          onRandomizePalette={handleRandomizePalette}
         />
       )}
 

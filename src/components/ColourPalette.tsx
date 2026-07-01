@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { copyToClipboard, hexToRgba, colorLuminance } from '../utils/color';
+import { copyToClipboard, hexToRgba, colorLuminance, generateRandomPalette } from '../utils/color';
 import ColourPicker from './ColourPicker';
 
 interface ColourPaletteProps {
@@ -7,6 +7,7 @@ interface ColourPaletteProps {
   onClose: () => void;
   onSelectColor: (color: string) => void;
   onRecolor: (oldColor: string, newColor: string) => void;
+  onRandomizePalette: (mapping: { from: string; to: string }[]) => void;
 }
 
 function dedupeAndSort(colors: string[]): string[] {
@@ -23,8 +24,13 @@ function dedupeAndSort(colors: string[]): string[] {
   return unique;
 }
 
-export default function ColourPalette({ colors, onClose, onSelectColor, onRecolor }: ColourPaletteProps) {
-  const backdropRef = useRef<HTMLDivElement>(null);
+const PALETTE_MARGIN = 16;
+
+export default function ColourPalette({ colors, onClose, onSelectColor, onRecolor, onRandomizePalette }: ColourPaletteProps) {
+  const panelRef = useRef<HTMLDivElement>(null);
+  const dragRef = useRef<{ offsetX: number; offsetY: number } | null>(null);
+  const [pos, setPos] = useState<{ x: number; y: number }>({ x: PALETTE_MARGIN, y: PALETTE_MARGIN });
+  const [dragging, setDragging] = useState(false);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [recoloring, setRecoloring] = useState<{
     oldColor: string;
@@ -46,9 +52,31 @@ export default function ColourPalette({ colors, onClose, onSelectColor, onRecolo
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [onClose, recoloring]);
 
-  const handleBackdropClick = useCallback((e: React.MouseEvent) => {
-    if (e.target === backdropRef.current) onClose();
-  }, [onClose]);
+  const handleHeaderPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if ((e.target as HTMLElement).closest('.palette-close')) return;
+    const rect = panelRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    dragRef.current = { offsetX: e.clientX - rect.left, offsetY: e.clientY - rect.top };
+    setDragging(true);
+    (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
+  }, []);
+
+  const handleHeaderPointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (!dragRef.current) return;
+    const width = panelRef.current?.offsetWidth ?? 340;
+    const height = panelRef.current?.offsetHeight ?? 400;
+    const maxX = Math.max(PALETTE_MARGIN, window.innerWidth - width - PALETTE_MARGIN);
+    const maxY = Math.max(PALETTE_MARGIN, window.innerHeight - height - PALETTE_MARGIN);
+    const nextX = Math.min(Math.max(PALETTE_MARGIN, e.clientX - dragRef.current.offsetX), maxX);
+    const nextY = Math.min(Math.max(PALETTE_MARGIN, e.clientY - dragRef.current.offsetY), maxY);
+    setPos({ x: nextX, y: nextY });
+  }, []);
+
+  const handleHeaderPointerUp = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    dragRef.current = null;
+    setDragging(false);
+    (e.currentTarget as HTMLElement).releasePointerCapture?.(e.pointerId);
+  }, []);
 
   const copy = useCallback(async (key: string, text: string) => {
     const ok = await copyToClipboard(text);
@@ -87,15 +115,58 @@ export default function ColourPalette({ colors, onClose, onSelectColor, onRecolo
     setRecoloring(null);
   }, [recoloring, onRecolor]);
 
+  const handleRandomize = useCallback(() => {
+    if (sorted.length === 0) return;
+    setRecoloring(null);
+    const next = generateRandomPalette(sorted);
+    onRandomizePalette(sorted.map((from, i) => ({ from, to: next[i] })));
+  }, [sorted, onRandomizePalette]);
+
   return (
-    <div className="palette-backdrop" ref={backdropRef} onClick={handleBackdropClick}>
-      <div className="palette-modal">
-        <div className="palette-header">
+    <>
+      <div
+        className="palette-panel"
+        ref={panelRef}
+        style={{ left: pos.x, top: pos.y }}
+      >
+        <div
+          className={`palette-header${dragging ? ' dragging' : ''}`}
+          onPointerDown={handleHeaderPointerDown}
+          onPointerMove={handleHeaderPointerMove}
+          onPointerUp={handleHeaderPointerUp}
+          onPointerCancel={handleHeaderPointerUp}
+        >
           <h2 className="palette-title">Colour Palette</h2>
-          <button type="button" className="palette-close" onClick={onClose} aria-label="Close">
+          <button
+            type="button"
+            className="palette-close"
+            onClick={onClose}
+            onPointerDown={(e) => e.stopPropagation()}
+            aria-label="Close"
+          >
             &#10005;
           </button>
         </div>
+
+        {sorted.length > 0 && (
+          <div className="palette-toolbar">
+            <button
+              type="button"
+              className="palette-randomize-btn"
+              onClick={handleRandomize}
+              title="Generate a new random colour for each swatch, keeping brightness similar"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+                <polyline points="16 3 21 3 21 8" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <line x1="4" y1="20" x2="21" y2="3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                <polyline points="21 16 21 21 16 21" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <line x1="15" y1="15" x2="21" y2="21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                <line x1="4" y1="4" x2="9" y2="9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+              Randomize
+            </button>
+          </div>
+        )}
 
         {sorted.length === 0 ? (
           <p className="palette-empty">No colours to show.</p>
@@ -172,6 +243,6 @@ export default function ColourPalette({ colors, onClose, onSelectColor, onRecolo
           />
         </div>
       )}
-    </div>
+    </>
   );
 }

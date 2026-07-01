@@ -16,6 +16,8 @@ interface ToolbarProps {
   canRedo: boolean;
   onPaletteOpen: () => void;
   onHotkeysOpen: () => void;
+  onClearCanvas: () => void;
+  canClear: boolean;
 }
 
 interface ToolDef {
@@ -34,7 +36,18 @@ const TOOLS: ToolDef[] = [
 
 function ToolIcon({ t, color, active }: { t: ToolDef; color: string; active: boolean }) {
   if (!t.isShape) {
-    return <span aria-hidden="true">{'\u2196'}</span>;
+    // Filled mouse-pointer/cursor icon for the Select tool.
+    return (
+      <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+        <path
+          d="M4.5 2.8 L4.5 16.4 L7.9 13.1 L10.3 18.3 L12.6 17.2 L10.2 12 L14.6 11.6 Z"
+          fill="currentColor"
+          stroke="currentColor"
+          strokeWidth="0.6"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
   }
 
   const iconColor = active ? '#fff' : color;
@@ -69,7 +82,7 @@ function ToolIcon({ t, color, active }: { t: ToolDef; color: string; active: boo
   );
 }
 
-export default function Toolbar({ tool, color, colorPickerOpen, onToolChange, onColorChange, onColorPickerToggle, onColorPickerClose, onUndo, onRedo, canUndo, canRedo, onPaletteOpen, onHotkeysOpen }: ToolbarProps) {
+export default function Toolbar({ tool, color, colorPickerOpen, onToolChange, onColorChange, onColorPickerToggle, onColorPickerClose, onUndo, onRedo, canUndo, canRedo, onPaletteOpen, onHotkeysOpen, onClearCanvas, canClear }: ToolbarProps) {
   const swatchRef = useRef<HTMLButtonElement>(null);
 
   const popoverStyle: React.CSSProperties | undefined = colorPickerOpen && swatchRef.current
@@ -142,6 +155,23 @@ export default function Toolbar({ tool, color, colorPickerOpen, onToolChange, on
           disabled={!canRedo}
         >
           <span aria-hidden="true">&#8635;</span>
+        </button>
+
+        <button
+          type="button"
+          className="toolbar-btn"
+          title="Clear canvas"
+          aria-label="Clear canvas"
+          onClick={onClearCanvas}
+          disabled={!canClear}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+            <polyline points="3 6 5 6 21 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <line x1="10" y1="11" x2="10" y2="17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            <line x1="14" y1="11" x2="14" y2="17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            <path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
         </button>
 
         <div className="toolbar-divider" />
