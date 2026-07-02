@@ -4,7 +4,7 @@ https://github.com/user-attachments/assets/1ed17bce-6658-44eb-9f53-77aa48314448
 
 ## Use it
 
-[colour-palette-picker.jubinvillecam.workers.dev](https://colour-palette-picker.jubinvillecam.workers.dev/)
+[pick.cameronjubinville.com](https://pick.cameronjubinville.com/)
 
 A colour palette picker built with barebones React + Vite and vibe coding. 
 
