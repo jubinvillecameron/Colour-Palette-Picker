@@ -1,32 +1,40 @@
-# React + TypeScript + Vite
+# Colour Palette Picker
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+https://github.com/user-attachments/assets/1ed17bce-6658-44eb-9f53-77aa48314448
 
-Currently, two official plugins are available:
+## Use it
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+[colour-palette-picker.jubinvillecam.workers.dev](https://colour-palette-picker.jubinvillecam.workers.dev/)
 
-## React Compiler
+A colour palette picker built with barebones React + Vite and vibe coding. 
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+It's meant to be as lean as possible, and startup very quick.
+I was getting frustrated with the various colour palette generator websites, as they always show you the colours side by side, but they never show you what they look like
+with a background, or if you drew on top of them. I like having a simple canvas and experimenting with my colours that way so I can gauge how they look together, so a simple canvas like this works.
 
-## Expanding the Oxlint configuration
+This can be replaced by any other drawing canvas tool, I just find that this works for my workflow, as it starts quick and gets me what I need quickly.
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+## Features
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
-```
+- Drawing canvas with Select, Rectangle, Circle, and Pen tools
+- Drag, multi-select, and delete shapes
+- Double-click a shape to edit its colour
+- Colour palette panel sorted by luminance
+- Recolour all shapes of a given colour at once
+- Randomize palette while preserving brightness
+- Undo / Redo and Clear canvas
+- Keyboard shortcuts for everything
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## Commands
+
+- `npm run dev` — start dev server
+- `npm run build` — build for production
+- `npm run preview` — preview production build
+- `npm run lint` — run oxlint
+
+## Contributing
+
+Contributions are welcome. Open an issue or submit a PR.
+
+- Do NOT add any node_modules unless absolutely necessary.
+- Fast startup is the #1 priority.
