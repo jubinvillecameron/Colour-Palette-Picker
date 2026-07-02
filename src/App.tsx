@@ -27,11 +27,16 @@ interface EditingPopover {
   clientY: number;
 }
 
+interface DocumentState {
+  shapes: Shape[];
+  bgColor: string;
+}
+
 function App() {
-  const history = useHistory<Shape[]>([]);
+  const history = useHistory<DocumentState>({ shapes: [], bgColor: DEFAULT_BG_COLOR });
   const [tool, setTool] = useState<Tool>('rectangle');
   const [color, setColor] = useState(DEFAULT_COLOR);
-  const [bgColor, setBgColor] = useState(DEFAULT_BG_COLOR);
+  const [bgDraft, setBgDraft] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [editingPopover, setEditingPopover] = useState<EditingPopover | null>(null);
   const [colorDraft, setColorDraft] = useState<{ shapeId: string; color: string } | null>(null);
@@ -44,10 +49,10 @@ function App() {
   const handleRecolor = useCallback(
     (oldColor: string, newColor: string) => {
       if (oldColor === newColor) return;
-      const next = history.present.map((s) =>
+      const next = history.present.shapes.map((s) =>
         s.color === oldColor ? { ...s, color: newColor } : s,
       );
-      history.set(next);
+      history.set({ ...history.present, shapes: next });
       setColor(newColor);
     },
     [history],
@@ -64,11 +69,11 @@ function App() {
       }
       if (changeMap.size === 0) return;
 
-      const next = history.present.map((s) => {
+      const next = history.present.shapes.map((s) => {
         const replacement = changeMap.get(s.color.toLowerCase());
         return replacement ? { ...s, color: replacement } : s;
       });
-      history.set(next);
+      history.set({ ...history.present, shapes: next });
 
       const currentReplacement = changeMap.get(color.toLowerCase());
       if (currentReplacement) setColor(currentReplacement);
@@ -78,11 +83,13 @@ function App() {
 
   // Shapes with any in-progress (uncommitted) color edit applied, for live preview.
   const displayShapes = useMemo(() => {
-    if (!colorDraft) return history.present;
-    return history.present.map((s) =>
+    if (!colorDraft) return history.present.shapes;
+    return history.present.shapes.map((s) =>
       s.id === colorDraft.shapeId ? { ...s, color: colorDraft.color } : s,
     );
   }, [history.present, colorDraft]);
+
+  const displayBgColor = bgDraft ?? history.present.bgColor;
 
   const editingShape = useMemo(() => {
     if (!editingPopover) return null;
@@ -91,7 +98,7 @@ function App() {
 
   const handleCommit = useCallback(
     (next: Shape[]) => {
-      history.set(next);
+      history.set({ ...history.present, shapes: next });
     },
     [history],
   );
@@ -114,10 +121,10 @@ function App() {
 
   const commitColorDraft = useCallback(() => {
     if (colorDraft) {
-      const next = history.present.map((s) =>
+      const next = history.present.shapes.map((s) =>
         s.id === colorDraft.shapeId ? { ...s, color: colorDraft.color } : s,
       );
-      history.set(next);
+      history.set({ ...history.present, shapes: next });
       setColor(colorDraft.color);
       setColorDraft(null);
     }
@@ -131,15 +138,27 @@ function App() {
   const deleteSelected = useCallback(() => {
     if (selectedIds.length === 0) return;
     const ids = new Set(selectedIds);
-    history.set(history.present.filter((s) => !ids.has(s.id)));
+    history.set({ ...history.present, shapes: history.present.shapes.filter((s) => !ids.has(s.id)) });
     setSelectedIds([]);
   }, [selectedIds, history]);
 
   const handleClearCanvas = useCallback(() => {
-    if (history.present.length === 0) return;
-    history.set([]);
+    if (history.present.shapes.length === 0) return;
+    history.set({ shapes: [], bgColor: DEFAULT_BG_COLOR });
     setSelectedIds([]);
   }, [history]);
+
+  const commitBgDraft = useCallback(() => {
+    if (bgDraft !== null && bgDraft !== history.present.bgColor) {
+      history.set({ ...history.present, bgColor: bgDraft });
+    }
+    setBgDraft(null);
+  }, [bgDraft, history]);
+
+  const handleBgPickerClose = useCallback(() => {
+    commitBgDraft();
+    setBgPickerOpen(false);
+  }, [commitBgDraft]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -182,7 +201,10 @@ function App() {
 
       if (!isTyping && e.key === 'Tab' && !isMod) {
         e.preventDefault();
-        setBgPickerOpen((v) => !v);
+        setBgPickerOpen((v) => {
+          if (v) commitBgDraft();
+          return !v;
+        });
         return;
       }
 
@@ -198,7 +220,7 @@ function App() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [history, selectedIds, deleteSelected]);
+  }, [history, selectedIds, deleteSelected, commitBgDraft]);
 
   const handleToolChange = useCallback((next: Tool) => {
     setTool(next);
@@ -220,7 +242,7 @@ function App() {
         onCommit={handleCommit}
         tool={tool}
         color={color}
-        bgColor={bgColor}
+        bgColor={displayBgColor}
         selectedIds={selectedIds}
         onSelect={handleSelect}
         onDoubleClickShape={handleDoubleClickShape}
@@ -241,7 +263,7 @@ function App() {
         canUndo={history.canUndo}
         canRedo={history.canRedo}
         onClearCanvas={handleClearCanvas}
-        canClear={history.present.length > 0}
+        canClear={history.present.shapes.length > 0}
       />
 
       {editingShape && editingPopover && (
@@ -258,7 +280,7 @@ function App() {
         <button
           type="button"
           className="bg-color-swatch"
-          style={{ background: bgColor }}
+          style={{ background: displayBgColor }}
           onClick={() => setBgPickerOpen((v) => !v)}
           title="Background colour (Tab)"
           aria-label="Background colour"
@@ -266,9 +288,9 @@ function App() {
         {bgPickerOpen && (
           <div className="bg-color-popover">
             <ColourPicker
-              color={bgColor}
-              onChange={setBgColor}
-              onClose={() => setBgPickerOpen(false)}
+              color={displayBgColor}
+              onChange={setBgDraft}
+              onClose={handleBgPickerClose}
             />
           </div>
         )}

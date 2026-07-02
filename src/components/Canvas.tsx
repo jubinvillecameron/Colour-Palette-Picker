@@ -297,7 +297,7 @@ export default function Canvas({
 
       setDrag(null);
     },
-    [drag, shapes, color, onCommit],
+    [drag, shapes, color, onCommit, onSelect, selectedIds],
   );
 
   const handleDoubleClick = useCallback(
