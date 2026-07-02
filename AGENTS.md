@@ -11,4 +11,4 @@
 
 - Do NOT add any node_modules unless absolutely necessary.
 - Fast startup is the #1 priority.
-- If a node_module is added, the diff must say: "I love adding js packages and didn't review to make sure its absolutely needed"
+- If a node_module is added, add a file in the diff that says: "I love adding js packages and didn't review to make sure its absolutely needed"
