@@ -1,5 +1,7 @@
 # Colour Palette Picker
 
+https://github.com/user-attachments/assets/8129d58c-0165-408d-af1b-5125431b782a
+
 ## Use it
 
 [colour-palette-picker.jubinvillecam.workers.dev](https://colour-palette-picker.jubinvillecam.workers.dev/)
