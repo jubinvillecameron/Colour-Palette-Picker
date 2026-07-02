@@ -47,6 +47,7 @@
   border-radius: 16px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18), 0 1px 3px rgba(0, 0, 0, 0.08);
   z-index: 10;
+  max-width: calc(100vw - 24px);
 }
 
 .toolbar-btn {
@@ -114,6 +115,7 @@
   background: #fff;
   border-radius: 14px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.08);
+  max-width: min(260px, calc(100vw - 32px));
 }
 
 .toolbar-color-popover {
@@ -509,4 +511,56 @@
   font-size: 13px;
   color: #33343a;
   text-align: right;
+}
+
+@media (max-width: 520px) {
+  .toolbar {
+    gap: 5px;
+    padding: 6px;
+    border-radius: 14px;
+  }
+
+  .toolbar-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    font-size: 17px;
+  }
+
+  .toolbar-divider {
+    height: 22px;
+    margin: 0 3px;
+  }
+
+  .toolbar-color-swatch {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+  }
+}
+
+@media (max-width: 400px) {
+  .toolbar {
+    gap: 4px;
+    padding: 5px;
+    border-radius: 12px;
+  }
+
+  .toolbar-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 7px;
+    font-size: 15px;
+  }
+
+  .toolbar-divider {
+    height: 18px;
+    margin: 0 2px;
+  }
+
+  .toolbar-color-swatch {
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+  }
 }
