@@ -1,5 +1,9 @@
 # Colour Palette Picker
 
+## Use it
+
+[colour-palette-picker.jubinvillecam.workers.dev](https://colour-palette-picker.jubinvillecam.workers.dev/)
+
 A colour palette picker built with barebones React + Vite and vibe coding. 
 
 It's meant to be as lean as possible, and startup very quick.
@@ -18,11 +22,6 @@ This can be replaced by any other drawing canvas tool, I just find that this wor
 - Randomize palette while preserving brightness
 - Undo / Redo and Clear canvas
 - Keyboard shortcuts for everything
-
-## Try It Out
-
-[colour-palette-picker.jubinvillecam.workers.dev](https://colour-palette-picker.jubinvillecam.workers.dev/)
-
 
 ## Commands
 
