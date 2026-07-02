@@ -1,6 +1,6 @@
 # Colour Palette Picker
 
-https://github.com/user-attachments/assets/8129d58c-0165-408d-af1b-5125431b782a
+https://github.com/user-attachments/assets/1ed17bce-6658-44eb-9f53-77aa48314448
 
 ## Use it
 
