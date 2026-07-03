@@ -10,9 +10,12 @@ A colour palette picker built with barebones React + Vite and vibe coding.
 
 This is meant to be as lean as possible.
 I was getting frustrated with the various colour palette generator websites, they always got that 4 colour grid that is side by side with no background.
-What about if you lay the colours next to them? And put on a background, what if you draw colours to see how they shade together? So I quickly just vibe-coded this out to match what I wanted.
 
-This can be replaced by any other drawing canvas tool, I just find that this works for my workflow, as it starts quick and gets me what I need quickly.
+It's cool! You can click space bar and it generates a palette, but what if I want my palette to have more than 4 colours, what if I want it to have 1000 and I want to make it like it's a 2002 personal blog???
+Those 4 colours ain't saving nobody, so here you get a canvas and you can put a Billion. 
+
+I don't know how else to explain it except, 1 canvas, fast loading, unlimited colours, squares, circles and a pen tool.
+There's some other neat stuff, so read what the AI said below.
 
 ## Features
 
@@ -38,3 +41,5 @@ Contributions are welcome. Open an issue or submit a PR.
 
 - Do NOT add any node_modules unless absolutely necessary.
 - Fast startup is the #1 priority.
+
+Honestly, this can be replaced by any other drawing canvas tool, but this is just quick and works for what I want.
