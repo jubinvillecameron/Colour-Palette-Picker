@@ -8,9 +8,9 @@ https://github.com/user-attachments/assets/1ed17bce-6658-44eb-9f53-77aa48314448
 
 A colour palette picker built with barebones React + Vite and vibe coding. 
 
-It's meant to be as lean as possible, and startup very quick.
-I was getting frustrated with the various colour palette generator websites, as they always show you the colours side by side, but they never show you what they look like
-with a background, or if you drew on top of them. I like having a simple canvas and experimenting with my colours that way so I can gauge how they look together, so a simple canvas like this works.
+This is meant to be as lean as possible.
+I was getting frustrated with the various colour palette generator websites, they always got that 4 colour grid that is side by side with no background.
+What about if you lay the colours next to them? And put on a background, what if you draw colours to see how they shade together? So I quickly just vibe-coded this out to match what I wanted.
 
 This can be replaced by any other drawing canvas tool, I just find that this works for my workflow, as it starts quick and gets me what I need quickly.
 
